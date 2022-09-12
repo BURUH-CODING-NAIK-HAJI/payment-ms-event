@@ -39,6 +39,8 @@ func ErrorHandler(next http.Handler) http.Handler {
 
 				if convertedError, ok := err.(error); ok {
 					convertedErrorMessage = convertedError.Error()
+				} else if customError, ok := err.(errorgroup.Error); ok {
+					convertedErrorMessage = customError.Message
 				} else {
 					convertedErrorMessage = err.(string)
 				}
@@ -54,6 +56,7 @@ func ErrorHandler(next http.Handler) http.Handler {
 			}
 		}()
 
+		w.Header().Add("Content-Type", "application/json")
 		next.ServeHTTP(w, r)
 	})
 }

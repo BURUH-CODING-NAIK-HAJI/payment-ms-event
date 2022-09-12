@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"runtime"
 
 	"github.com/sirupsen/logrus"
@@ -14,12 +13,8 @@ func getRootPath() string {
 	_, b, _, _ := runtime.Caller(0)
 	currentPath := filepath.Dir(b)
 
-	regexPattern := fmt.Sprintf("%s%s", os.Getenv("SERVICE_NAME"), ".*")
-	regex, _ := regexp.Compile(regexPattern)
-
-	logPath := fmt.Sprintf("%s%s", os.Getenv("SERVICE_NAME"), "/log/error.log")
-	rootPath := regex.ReplaceAll([]byte(currentPath), []byte(logPath))
-	return string(rootPath)
+	logPath := fmt.Sprintf(currentPath+"/%s", "../../log/error.log")
+	return logPath
 }
 
 func CreateErrorLogger() *logrus.Logger {

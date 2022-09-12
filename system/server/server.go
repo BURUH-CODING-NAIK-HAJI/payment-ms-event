@@ -6,19 +6,16 @@ import (
 	"os"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/rizface/golang-api-template/app/controller/welcomecontroller"
-	"github.com/rizface/golang-api-template/app/repository/welcomerepository"
-	"github.com/rizface/golang-api-template/app/service/welcomeservice"
+	"github.com/rizface/golang-api-template/app/controller/eventcontroller"
+	"github.com/rizface/golang-api-template/app/repository/eventrepository"
+	"github.com/rizface/golang-api-template/app/service/eventservice"
 )
 
 func SetupController(router *chi.Mux) {
-	// SETUP WELCOME REPOSITORY
-	welcomerepository := welcomerepository.New()
-	// SETUP WELCOME SERVICE
-	welcomeService := welcomeservice.New(welcomerepository)
-	// SETUP WELCOME CONTROLLER
-	welcomeController := welcomecontroller.New(welcomeService)
-	welcomecontroller.Setup(router, welcomeController)
+	eventrepository := eventrepository.New()
+	eventservice := eventservice.New(eventrepository)
+	controller := eventcontroller.New(eventservice)
+	eventcontroller.Setup(router, controller)
 }
 
 func CreateHttpServer(router http.Handler) *http.Server {

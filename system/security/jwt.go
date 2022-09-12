@@ -60,7 +60,7 @@ func GenerateToken(userData *securityentity.UserData) securityentity.GeneratedRe
 
 func DecodeToken(tokenString, tokenType string) JwtClaim {
 	var secret string
-	if tokenType == "bearer" {
+	if tokenType == "Bearer" {
 		secret = config.JWT_BEARER_SECRET
 	} else {
 		secret = config.JWT_REFRESH_SECRET
