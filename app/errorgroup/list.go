@@ -31,4 +31,8 @@ var (
 		Code:    http.StatusBadRequest,
 		Message: "BAD_REQUEST",
 	}
+	FAILED_CREATE_EVENT = Error{
+		Code:    http.StatusBadRequest,
+		Message: "FAILED_CREATE_EVENT",
+	}
 )

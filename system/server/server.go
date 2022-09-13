@@ -9,11 +9,12 @@ import (
 	"github.com/rizface/golang-api-template/app/controller/eventcontroller"
 	"github.com/rizface/golang-api-template/app/repository/eventrepository"
 	"github.com/rizface/golang-api-template/app/service/eventservice"
+	"gorm.io/gorm"
 )
 
-func SetupController(router *chi.Mux) {
+func SetupController(router *chi.Mux, db *gorm.DB) {
 	eventrepository := eventrepository.New()
-	eventservice := eventservice.New(eventrepository)
+	eventservice := eventservice.New(eventrepository, db)
 	controller := eventcontroller.New(eventservice)
 	eventcontroller.Setup(router, controller)
 }

@@ -21,7 +21,6 @@ func AuthHandler(next http.Handler) http.Handler {
 
 		claims := security.DecodeToken(tokenSegment[1], "Bearer")
 		r = r.WithContext(context.WithValue(r.Context(), "user", claims))
-		r.Header.Add("Test", "Asd")
 		next.ServeHTTP(w, r)
 	})
 }
