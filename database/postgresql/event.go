@@ -11,7 +11,7 @@ type Event struct {
 	UserID      string `gorm:"not null;"`
 	Name        string `gorm:"not null"`
 	Description string
-	CreateAt    time.Time
+	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	Deadline    time.Time `gorm:"not null"`
 }
@@ -22,7 +22,7 @@ func (e *Event) ToDomain() *responseentity.Event {
 		UserId:      e.UserID,
 		Name:        e.Name,
 		Description: e.Description,
-		CreatedAt:   e.CreateAt,
+		CreatedAt:   e.CreatedAt,
 		UpdatedAt:   e.UpdatedAt,
 		Deadline:    e.Deadline,
 	}

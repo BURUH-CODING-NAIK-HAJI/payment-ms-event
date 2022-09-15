@@ -1,6 +1,9 @@
 package eventservice
 
 import (
+	"context"
+	"time"
+
 	"github.com/rizface/golang-api-template/app/entity/requestentity"
 	"github.com/rizface/golang-api-template/app/entity/responseentity"
 	"github.com/rizface/golang-api-template/app/errorgroup"
@@ -11,6 +14,8 @@ import (
 
 type EventServiceInterface interface {
 	Create(payload map[string]interface{}) *responseentity.Event
+	Get() *[]responseentity.Event
+	Delete(id string) *responseentity.Event
 }
 
 type EventService struct {
@@ -38,4 +43,27 @@ func (eventservice *EventService) Create(props map[string]interface{}) *response
 	}
 
 	return result
+}
+
+func (eventservice *EventService) Get() *[]responseentity.Event {
+	background := context.Background()
+	ctx, cancel := context.WithTimeout(background, 5*time.Second)
+	defer cancel()
+	result, err := eventservice.eventrepository.Get(eventservice.db, ctx)
+	if err != nil {
+		panic(err)
+	}
+	return result
+}
+
+func (eventservice *EventService) Delete(id string) *responseentity.Event {
+	event, err := eventservice.eventrepository.GetOne(eventservice.db, id)
+	if err != nil {
+		panic(err)
+	}
+	err = eventservice.eventrepository.Delete(eventservice.db, event.Id)
+	if err != nil {
+		panic(err)
+	}
+	return event
 }

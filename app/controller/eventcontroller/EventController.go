@@ -7,11 +7,14 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/rizface/golang-api-template/app/entity/requestentity"
 	"github.com/rizface/golang-api-template/app/middleware"
+	"github.com/rizface/golang-api-template/app/schema"
 	"github.com/rizface/golang-api-template/app/service/eventservice"
 )
 
 type EventControllerInterface interface {
 	Create(w http.ResponseWriter, r *http.Request)
+	Get(w http.ResponseWriter, r *http.Request)
+	Delete(w http.ResponseWriter, r *http.Request)
 }
 
 type EventController struct {
@@ -28,6 +31,8 @@ func Setup(router *chi.Mux, controller EventControllerInterface) {
 	router.Route("/", func(r chi.Router) {
 		r.Use(middleware.AuthHandler)
 		r.Post("/", controller.Create)
+		r.Get("/", controller.Get)
+		r.Delete("/{id}", controller.Delete)
 	})
 }
 
@@ -48,5 +53,21 @@ func (event *EventController) Create(w http.ResponseWriter, r *http.Request) {
 		"payload": payload,
 	}
 	result := event.eventservice.Create(props)
+	json.NewEncoder(w).Encode(result)
+}
+
+func (event *EventController) Get(w http.ResponseWriter, r *http.Request) {
+	result := event.eventservice.Get()
+	json.NewEncoder(w).Encode(result)
+}
+
+func (event *EventController) Delete(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	err := schema.ValidateEventId(id)
+	if err != nil {
+		panic(err)
+	}
+
+	result := event.eventservice.Delete(id)
 	json.NewEncoder(w).Encode(result)
 }

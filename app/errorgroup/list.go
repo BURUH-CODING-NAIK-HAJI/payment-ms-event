@@ -35,4 +35,8 @@ var (
 		Code:    http.StatusBadRequest,
 		Message: "FAILED_CREATE_EVENT",
 	}
+	EVENT_NOT_FOUND = Error{
+		Code:    http.StatusNotFound,
+		Message: "EVENT_NOT_FOUND",
+	}
 )

@@ -11,6 +11,7 @@ import (
 	"github.com/rizface/golang-api-template/app/errorgroup"
 	"github.com/rizface/golang-api-template/system/logger"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 func ErrorHandler(next http.Handler) http.Handler {
@@ -22,13 +23,15 @@ func ErrorHandler(next http.Handler) http.Handler {
 				var errStruct = responseentity.Error{
 					Id: uniuri.New(),
 				}
-
 				if group, ok := err.(errorgroup.Error); ok {
 					errStruct.Code = group.Code
 					errStruct.Message = group.Message
-				} else if validatorError, ok := err.(validation.Errors); ok {
+				} else if validatorError, ok := err.(validation.Error); ok {
 					errStruct.Code = errorgroup.BAD_REQUEST.Code
 					errStruct.Message = validatorError.Error()
+				} else if errors.Is(err.(error), gorm.ErrRecordNotFound) {
+					errStruct.Code = errorgroup.EVENT_NOT_FOUND.Code
+					errStruct.Message = errorgroup.EVENT_NOT_FOUND.Message
 				} else {
 					errStruct.Code = errorgroup.InternalServerError.Code
 					errStruct.Message = errorgroup.InternalServerError.Message
