@@ -16,6 +16,8 @@ type EventServiceInterface interface {
 	Create(payload map[string]interface{}) *responseentity.Event
 	Get() *[]responseentity.Event
 	Delete(id string) *responseentity.Event
+	GetOne(id string) *responseentity.Event
+	UpdateOneById(map[string]interface{}) *responseentity.Event
 }
 
 type EventService struct {
@@ -66,4 +68,34 @@ func (eventservice *EventService) Delete(id string) *responseentity.Event {
 		panic(err)
 	}
 	return event
+}
+
+func (eventservice *EventService) GetOne(id string) *responseentity.Event {
+	event, err := eventservice.eventrepository.GetOne(eventservice.db, id)
+	if err != nil {
+		panic(err)
+	}
+	return event
+}
+
+func (eventservice *EventService) UpdateOneById(data map[string]interface{}) *responseentity.Event {
+	id := data["id"].(string)
+	payload := data["payload"].(*requestentity.Event)
+	user := data["user"].(security.JwtClaim)
+
+	event, err := eventservice.eventrepository.GetOne(eventservice.db, id)
+	if err != nil {
+		panic(err)
+	}
+
+	if event.UserId != user.UserData.Id {
+		panic(errorgroup.UNAUTHORIZED)
+	}
+
+	result, err := eventservice.eventrepository.UpdateOneById(eventservice.db, id, payload)
+	if err != nil {
+		panic(err)
+	}
+
+	return result
 }

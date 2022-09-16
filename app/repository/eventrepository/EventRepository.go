@@ -16,6 +16,7 @@ type EventRepositoryInterface interface {
 	Get(db *gorm.DB, ctx context.Context) (*[]responseentity.Event, error)
 	GetOne(db *gorm.DB, id string) (*responseentity.Event, error)
 	Delete(db *gorm.DB, id string) error
+	UpdateOneById(db *gorm.DB, id string, payload *requestentity.Event) (*responseentity.Event, error)
 }
 
 type EventRepository struct {
@@ -74,4 +75,15 @@ func (eventrepository *EventRepository) GetOne(db *gorm.DB, id string) (*respons
 func (eventrepository *EventRepository) Delete(db *gorm.DB, id string) error {
 	query := db.Delete(&postgresql.Event{ID: id})
 	return query.Error
+}
+
+func (eventrepository *EventRepository) UpdateOneById(db *gorm.DB, id string, payload *requestentity.Event) (*responseentity.Event, error) {
+	event := &postgresql.Event{ID: id}
+	deadline, _ := time.Parse(time.RFC3339, payload.Deadline)
+	query := db.Model(event).Updates(postgresql.Event{Name: payload.Name, Description: payload.Description, Deadline: deadline})
+	if query.Error != nil {
+		return nil, query.Error
+	}
+
+	return event.ToDomain(), nil
 }
