@@ -16,7 +16,7 @@ func AuthHandler(next http.Handler) http.Handler {
 		authHeader := r.Header.Get("authorization")
 		tokenSegment := strings.Split(authHeader, " ")
 		if len(tokenSegment) != 2 || tokenSegment[0] != "Bearer" {
-			panic(errorgroup.TOKEN_INVALID)
+			panic(errorgroup.UNAUTHORIZED)
 		}
 
 		claims := security.DecodeToken(tokenSegment[1], "Bearer")
