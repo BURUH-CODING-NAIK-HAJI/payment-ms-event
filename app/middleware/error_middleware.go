@@ -26,7 +26,7 @@ func ErrorHandler(next http.Handler) http.Handler {
 				if group, ok := err.(errorgroup.Error); ok {
 					errStruct.Code = group.Code
 					errStruct.Message = group.Message
-				} else if validatorError, ok := err.(validation.Error); ok {
+				} else if validatorError, ok := err.(validation.Errors); ok {
 					errStruct.Code = errorgroup.BAD_REQUEST.Code
 					errStruct.Message = validatorError.Error()
 				} else if errors.Is(err.(error), gorm.ErrRecordNotFound) {

@@ -15,7 +15,7 @@ import (
 type EventServiceInterface interface {
 	Create(payload map[string]interface{}) *responseentity.Event
 	Get() *[]responseentity.Event
-	Delete(id string) *responseentity.Event
+	Delete(id string, user interface{}) *responseentity.Event
 	GetOne(id string) *responseentity.Event
 	UpdateOneById(map[string]interface{}) *responseentity.Event
 }
@@ -58,11 +58,17 @@ func (eventservice *EventService) Get() *[]responseentity.Event {
 	return result
 }
 
-func (eventservice *EventService) Delete(id string) *responseentity.Event {
+func (eventservice *EventService) Delete(id string, user interface{}) *responseentity.Event {
 	event, err := eventservice.eventrepository.GetOne(eventservice.db, id)
 	if err != nil {
 		panic(err)
 	}
+
+	userData := user.(security.JwtClaim).UserData
+	if event.UserId != userData.Id {
+		panic(errorgroup.UNAUTHORIZED)
+	}
+
 	err = eventservice.eventrepository.Delete(eventservice.db, event.Id)
 	if err != nil {
 		panic(err)

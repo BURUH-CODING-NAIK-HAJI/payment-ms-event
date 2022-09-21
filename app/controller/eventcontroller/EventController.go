@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/rizface/golang-api-template/app/entity/requestentity"
+	"github.com/rizface/golang-api-template/app/entity/responseentity"
 	"github.com/rizface/golang-api-template/app/errorgroup"
 	"github.com/rizface/golang-api-template/app/middleware"
 	"github.com/rizface/golang-api-template/app/schema"
@@ -58,12 +59,20 @@ func (event *EventController) Create(w http.ResponseWriter, r *http.Request) {
 		"payload": payload,
 	}
 	result := event.eventservice.Create(props)
-	json.NewEncoder(w).Encode(result)
+	json.NewEncoder(w).Encode(responseentity.Response{
+		Code:    http.StatusOK,
+		Message: "SUCCESS",
+		Data:    result,
+	})
 }
 
 func (event *EventController) Get(w http.ResponseWriter, r *http.Request) {
 	result := event.eventservice.Get()
-	json.NewEncoder(w).Encode(result)
+	json.NewEncoder(w).Encode(responseentity.Response{
+		Code:    http.StatusOK,
+		Message: "SUCCESS",
+		Data:    result,
+	})
 }
 
 func (event *EventController) Delete(w http.ResponseWriter, r *http.Request) {
@@ -72,9 +81,13 @@ func (event *EventController) Delete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-
-	result := event.eventservice.Delete(id)
-	json.NewEncoder(w).Encode(result)
+	user := r.Context().Value("user")
+	result := event.eventservice.Delete(id, user)
+	json.NewEncoder(w).Encode(responseentity.Response{
+		Code:    http.StatusOK,
+		Message: "SUCCESS",
+		Data:    result,
+	})
 }
 
 func (event *EventController) GetOne(w http.ResponseWriter, r *http.Request) {
@@ -85,7 +98,11 @@ func (event *EventController) GetOne(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := event.eventservice.GetOne(id)
-	json.NewEncoder(w).Encode(result)
+	json.NewEncoder(w).Encode(responseentity.Response{
+		Code:    http.StatusOK,
+		Message: "SUCCESS",
+		Data:    result,
+	})
 }
 
 func (event *EventController) UpdateOneById(w http.ResponseWriter, r *http.Request) {
@@ -112,5 +129,9 @@ func (event *EventController) UpdateOneById(w http.ResponseWriter, r *http.Reque
 		"id":      id,
 	}
 	result := event.eventservice.UpdateOneById(data)
-	json.NewEncoder(w).Encode(result)
+	json.NewEncoder(w).Encode(responseentity.Response{
+		Code:    http.StatusOK,
+		Message: "SUCCESS",
+		Data:    result,
+	})
 }

@@ -81,9 +81,11 @@ func (eventrepository *EventRepository) UpdateOneById(db *gorm.DB, id string, pa
 	event := &postgresql.Event{ID: id}
 	deadline, _ := time.Parse(time.RFC3339, payload.Deadline)
 	query := db.Model(event).Updates(postgresql.Event{Name: payload.Name, Description: payload.Description, Deadline: deadline})
+
 	if query.Error != nil {
 		return nil, query.Error
 	}
 
+	query.Scan(event)
 	return event.ToDomain(), nil
 }
