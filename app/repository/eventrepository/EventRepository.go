@@ -13,7 +13,8 @@ import (
 
 type EventRepositoryInterface interface {
 	Create(db *gorm.DB, userId string, payload *requestentity.Event) (*responseentity.Event, error)
-	Get(db *gorm.DB, ctx context.Context) (*[]responseentity.Event, error)
+	Get(db *gorm.DB, pagination *requestentity.Pagination, ctx context.Context) (*[]responseentity.Event, error)
+	Count(db *gorm.DB) int64
 	GetOne(db *gorm.DB, id string) (*responseentity.Event, error)
 	Delete(db *gorm.DB, id string) error
 	UpdateOneById(db *gorm.DB, id string, payload *requestentity.Event) (*responseentity.Event, error)
@@ -47,10 +48,12 @@ func (eventrepository *EventRepository) Create(db *gorm.DB, userId string, paylo
 	return event.ToDomain(), nil
 }
 
-func (eventrepository *EventRepository) Get(db *gorm.DB, ctx context.Context) (*[]responseentity.Event, error) {
+func (eventrepository *EventRepository) Get(db *gorm.DB, pagination *requestentity.Pagination, ctx context.Context) (*[]responseentity.Event, error) {
 	var events []postgresql.Event
 	var result []responseentity.Event
-	query := db.Order("created_at desc").Find(&events).WithContext(ctx)
+	offset := (pagination.Current - 1) * pagination.Limit
+
+	query := db.Order("created_at desc").Offset(offset).Limit(pagination.Limit).Find(&events).WithContext(ctx)
 	if query.Error != nil {
 		return nil, query.Error
 	}
@@ -88,4 +91,10 @@ func (eventrepository *EventRepository) UpdateOneById(db *gorm.DB, id string, pa
 
 	query.Scan(event)
 	return event.ToDomain(), nil
+}
+
+func (eventrepository *EventRepository) Count(db *gorm.DB) int64 {
+	var count int64
+	db.Model(&postgresql.Event{}).Count(&count)
+	return count
 }

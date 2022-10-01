@@ -14,7 +14,7 @@ import (
 
 type EventServiceInterface interface {
 	Create(payload map[string]interface{}) *responseentity.Event
-	Get() *[]responseentity.Event
+	Get(pagination *requestentity.Pagination) *[]responseentity.Event
 	Delete(id string, user interface{}) *responseentity.Event
 	GetOne(id string) *responseentity.Event
 	UpdateOneById(map[string]interface{}) *responseentity.Event
@@ -47,11 +47,16 @@ func (eventservice *EventService) Create(props map[string]interface{}) *response
 	return result
 }
 
-func (eventservice *EventService) Get() *[]responseentity.Event {
+func (eventservice *EventService) Get(pagination *requestentity.Pagination) *[]responseentity.Event {
 	background := context.Background()
 	ctx, cancel := context.WithTimeout(background, 5*time.Second)
 	defer cancel()
-	result, err := eventservice.eventrepository.Get(eventservice.db, ctx)
+	result, err := eventservice.eventrepository.Get(eventservice.db, pagination, ctx)
+
+	pagination.TotalRows = int(eventservice.eventrepository.Count(eventservice.db))
+	pagination.TotalPage = pagination.TotalRows / pagination.Limit
+	pagination.Match = len(*result)
+
 	if err != nil {
 		panic(err)
 	}

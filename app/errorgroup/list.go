@@ -39,4 +39,8 @@ var (
 		Code:    http.StatusNotFound,
 		Message: "EVENT_NOT_FOUND",
 	}
+	INVALID_PAGINATION_PARAMETER = Error{
+		Code:    http.StatusBadRequest,
+		Message: "",
+	}
 )

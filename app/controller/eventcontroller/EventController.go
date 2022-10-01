@@ -67,11 +67,13 @@ func (event *EventController) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (event *EventController) Get(w http.ResponseWriter, r *http.Request) {
-	result := event.eventservice.Get()
+	pagination := requestentity.NewPagination(r.URL.Query())
+	result := event.eventservice.Get(pagination)
 	json.NewEncoder(w).Encode(responseentity.Response{
 		Code:    http.StatusOK,
 		Message: "SUCCESS",
 		Data:    result,
+		Page:    pagination,
 	})
 }
 
